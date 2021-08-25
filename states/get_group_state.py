@@ -1,6 +1,10 @@
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
-class get_group(StatesGroup):
+class get_group_st(StatesGroup):
     group = State()
-    print_table = State()
+    chose = State()
+
+
+class get_group_th(StatesGroup):
+    group = State()

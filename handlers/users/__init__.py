@@ -1,6 +1,8 @@
 from . import help
 from . import start
-from . import select_group
+from . import info
+from . import for_student
+from . import for_teacher
 
 
 
