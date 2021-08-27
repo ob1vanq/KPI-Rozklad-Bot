@@ -1,5 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from handlers.users.parsing.times import time
+
+from handlers.users.req.times import time
 
 keyboard = ReplyKeyboardMarkup(
     resize_keyboard= True,
@@ -14,15 +15,6 @@ keyboard = ReplyKeyboardMarkup(
     one_time_keyboard = True
 )
 
-keyboard3 = ReplyKeyboardMarkup(
-    resize_keyboard= True,
-    keyboard=[
-        [
-            KeyboardButton(text=f"Показати розклад на {time.current_day()}")
-        ]
-    ],
-    one_time_keyboard = True
-)
 
 keyboard2 = ReplyKeyboardMarkup(
     resize_keyboard= True,
@@ -31,11 +23,8 @@ keyboard2 = ReplyKeyboardMarkup(
             KeyboardButton(text=f"Показати розклад на сьогодні: {time.current_day()}")
         ],
         [
-            KeyboardButton(text="Перший тиждень"),
-            KeyboardButton(text="Другий тиждень")
-        ],
-        [
-            KeyboardButton(text="Показати весь розклад")
+            KeyboardButton(text="Цей тиждень"),
+            KeyboardButton(text="Наступний тиждень")
         ],
         [
             KeyboardButton(text="Назад"),
@@ -53,3 +42,10 @@ keyboard_back = ReplyKeyboardMarkup(
     ],
     one_time_keyboard = True
 )
+
+def construct(d: dict):
+    long = len(d)
+    keyboard = [[KeyboardButton(text = f"{i+1} {d.get(f'{i}').get('group')}")] for i in range(long)]
+    keyboard.append([KeyboardButton(text="Назад")])
+
+    return ReplyKeyboardMarkup(resize_keyboard=True,keyboard = keyboard, one_time_keyboard=True)
