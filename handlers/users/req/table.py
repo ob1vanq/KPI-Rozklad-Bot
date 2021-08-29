@@ -11,6 +11,7 @@ class Table(parser):
         super().__init__(soup)
 
 
+
     @staticmethod
     def is_valid_student(soup):
         not_group = soup.find('span', id="ctl00_MainContent_ctl00_lblError")

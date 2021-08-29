@@ -145,26 +145,25 @@ class parser:
             pair = parser.get_current_pair(self, current_pair)
             long = index + 1
 
-        elif closest_pair and time.pair_index():
+        if closest_pair:
             for i in parser.main_week:
                 pairs = i.find_all('td', class_="closest_pair")
                 if pairs == closest_pair and self.current_week == "first":
-                    index = time.pair_index()
+                    index = parser.get_closest_index(self)
                     pair = ["<b>⏩ Наступна пара\n\n</b>" + parser.get_pair(self, closest_pair)[0]]
                     long = index + 1
                 else:
                     long = len(day_backlight)
-        else:
+        if day_backlight:
             long = len(day_backlight)
+
 
         lines = list()
         for td in range(long):
             if td == index:
                 lines.append(pair)
-            else:
-
-                line = parser.get_pair(self, [day_backlight[td]])
-                lines.append(line)
+            line = parser.get_pair(self, [day_backlight[td]])
+            lines.append(line)
 
         return dict(enumerate(lines))
 
@@ -180,4 +179,15 @@ class parser:
                 return "first"
             else:
                 return "second"
+
+    def get_closest_index(self):
+        body = self.body
+        for tr in range(len(body)):
+            if body[tr].find_all('td', class_="closest_pair"):
+                return tr
+
+
+
+
+
 

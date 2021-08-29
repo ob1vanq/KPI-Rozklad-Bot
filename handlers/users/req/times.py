@@ -1,7 +1,8 @@
 import datetime
 import locale
 
-locale.setlocale(locale.LC_ALL, "uk_UA")
+
+locale.setlocale(locale.LC_ALL, "uk_UA.utf8")
 
 
 class time:
@@ -43,14 +44,17 @@ class time:
 
     @staticmethod
     def current_day():
+        time.update_now()
         return time.__now.strftime("%A").title()
 
     @staticmethod
     def hour_minutes(text="%H:%M"):
+        time.update_now()
         return time.__now.strftime(text).title()
 
     @staticmethod
     def day_before():
+        time.update_now()
         current = time.hour_minutes("%A").lower()
         if current == 'понеділок':
             return 7
@@ -69,6 +73,7 @@ class time:
 
     @staticmethod
     def day_after():
+        time.update_now()
         current = time.hour_minutes("%A").lower()
         if current == 'понеділок':
             return 0
@@ -126,7 +131,7 @@ class time:
 
     @staticmethod
     def pair_index():
-        for m in range(160):
+        for m in range(1440):
             diapazon = {0: '08:30', 1: '10:25', 2: '12:20', 3: '14:15', 4: '16:10', 5: '18:30'}
             cur = datetime.datetime.now() + datetime.timedelta(minutes=m)
             for i in range(6):
