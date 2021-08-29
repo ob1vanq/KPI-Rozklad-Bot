@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters import Text
 from handlers.users.req.connection import connect
 from handlers.users.req.table import Table
 from handlers.users.req.times import time
-from keyboards.default.rozklad import keyboard2, keyboard_back, construct
+from keyboards.default.rozklad import keyboard2, keyboard_back, construct, keyboard
 from loader import dp
 from states.get_group_state import get_group_st
 
@@ -28,8 +28,8 @@ async def connect_to_site(message: types.Message, state: FSMContext):
 
         if Table.chek_valid_webpage(soup):
             d = Table.chek_valid_webpage(soup)
-            keyboard = construct(d)
-            await message.answer(f"Оберіть групу", reply_markup=keyboard)
+            keyb = construct(d)
+            await message.answer(f"Оберіть групу", reply_markup=keyb)
             await state.update_data(
                 {
                     "d": d
@@ -37,8 +37,8 @@ async def connect_to_site(message: types.Message, state: FSMContext):
             )
             await get_group_st.option.set()
 
-        elif isinstance(Table.is_valid_data(soup), str):
-            await message.answer(text="Групи з такою назвою не знайдено!")
+        elif isinstance(Table.is_valid_student(soup), str):
+            await message.answer(text=Table.is_valid_student(soup))
         else:
             await message.answer(text=f"Оберіть наступну дію", reply_markup=keyboard2)
             await state.update_data(
@@ -48,7 +48,8 @@ async def connect_to_site(message: types.Message, state: FSMContext):
             )
             await get_group_st.next()
     else:
-        await message.answer(text=f"{connection.error}")
+        await message.answer(text=f"{connection.error}", reply_markup=keyboard)
+        await state.finish()
 
 
 @dp.message_handler(state=get_group_st.option)
@@ -73,7 +74,7 @@ async def post_full_table(message: types.Message, state: FSMContext):
     group = data.get("group")
     connection = connect(title=group, person="student")
 
-    if get_group_st.option2:
+    if await state.get_state() == "get_group_st:option2":
         url = data.get("url")
         soup = connect.get_soup(url)
     else:
@@ -90,7 +91,8 @@ async def post_full_table(message: types.Message, state: FSMContext):
             await message.answer("Розклад на наступний тиждень", reply_markup=keyboard2)
             await student.get_week(chat_id=message.from_user.id, week=week)
     else:
-        await message.answer(text=f"{connection.error}")
+        await message.answer(text=f"{connection.error}", reply_markup=keyboard)
+        await state.finish()
 
 
 @dp.message_handler(Text(equals=[f"Показати розклад на сьогодні: {time.current_day()}"]),
@@ -113,4 +115,5 @@ async def post_one_table(message: types.Message, state: FSMContext):
         str = f"<pre>{group}</pre>\n" + student.get_today()
         await message.answer(str, parse_mode="HTML", disable_web_page_preview=True)
     else:
-        await message.answer(text=f"{connection.error}")
+        await message.answer(text=f"{connection.error}", reply_markup=keyboard)
+        await state.finish()

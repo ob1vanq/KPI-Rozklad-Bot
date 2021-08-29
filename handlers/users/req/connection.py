@@ -3,15 +3,13 @@ import lxml
 import fake_useragent
 
 from bs4 import BeautifulSoup
-from requests import ConnectionError
+from requests import ConnectionError, HTTPError
 
 
 class connect:
-
     url_student = "http://rozklad.kpi.ua/Schedules/ScheduleGroupSelection.aspx"
     url_teacher = "http://rozklad.kpi.ua/Schedules/LecturerSelection.aspx"
 
-    # "ctl00$MainContent$ctl00$txtboxGroup": "{title}"
     data_student = {
         "ctl00_ToolkitScriptManager_HiddenField": ";;AjaxControlToolkit,+Version=3.5.60623.0,+Culture=neutral,+PublicKeyToken=28f01b0e84b6d53e::834c499a-b613-438c-a778-d32ab4976134:22eca927:ce87be9:2d27a0fe:23389d96:77aedcab:1bd6c8d4:7b704157",
 
@@ -23,7 +21,6 @@ class connect:
         "hiddenInputToUpdateATBuffer_CommonToolkitScripts": "1"
     }
 
-    # "ctl00$MainContent$txtboxLecturer": "{title}",
     data_teacher = {
         "ctl00_ToolkitScriptManager_HiddenField": ";;AjaxControlToolkit,+Version=3.5.60623.0,+Culture=neutral,+PublicKeyToken=28f01b0e84b6d53e::834c499a-b613-438c-a778-d32ab4976134:22eca927:ce87be9:2d27a0fe:23389d96:77aedcab:1bd6c8d4:7b704157",
         "__VIEWSTATE": "/wEMDAwQAgAADgEMBQAMEAIAAA4BDAUDDBACAAAOAgwFCwwQAgwPAgEIQ3NzQ2xhc3MBD2J0biBidG4tcHJpbWFyeQEEXyFTQgUCAAAADAUNDBACAAAOAQwFAwwQAgwADwEBB29uZm9jdXMBHXRoaXMudmFsdWU9Jyc7dGhpcy5vbmZvY3VzPScnAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkWCFbMSgxOXJsGpLI9ZU2imYY",
@@ -52,9 +49,8 @@ class connect:
         self.error: str
         connect.connect(self)
 
-
-    def format_data(self,data, p):
-        data.update({p:self.title})
+    def format_data(self, data, p):
+        data.update({p: self.title})
         return data
 
     def connect(self):
@@ -65,6 +61,12 @@ class connect:
         except ConnectionError as err:
             self.error = f"Помилка: {err}"
             return False
+
+        except HTTPError as err:
+            self.error = f"Помилка: {err}"
+            return False
+        except:
+            self.error = f"Відбулась невідома помилка"
         else:
             connect.soup(self, response)
             return True
@@ -76,4 +78,3 @@ class connect:
     def get_soup(url):
         response = requests.get(url)
         return BeautifulSoup(response.text, 'lxml')
-

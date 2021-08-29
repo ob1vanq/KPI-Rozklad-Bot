@@ -12,6 +12,7 @@ class parser:
         self.params = parser.get_table_params(self, self.body)
         self.cl_body = parser.clear_body(self, params=self.params, body=self.body)
         self.current_week = parser.__current_week(soup)
+        time.update_now()
 
     @staticmethod
     def chek_valid_webpage(soup):

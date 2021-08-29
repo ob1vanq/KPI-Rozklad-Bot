@@ -4,18 +4,24 @@ from .times import time
 
 class Table(parser):
 
-
     url = "http://rozklad.kpi.ua/Schedules/ScheduleGroupSelection.aspx"
 
     def __init__(self, soup):
         self.soup = soup
         super().__init__(soup)
 
+
     @staticmethod
-    def is_valid_data(soup):
+    def is_valid_student(soup):
         not_group = soup.find('span', id="ctl00_MainContent_ctl00_lblError")
         if not_group:
             return not_group.text
+
+    @staticmethod
+    def is_valid_teacher(soup):
+        not_name = soup.find('span', id="ctl00_MainContent_lblError")
+        if not_name:
+            return not_name.text
 
     async def get_week(self, week, chat_id):
 

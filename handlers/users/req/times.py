@@ -1,17 +1,23 @@
 import datetime
 import locale
 
-locale.setlocale(locale.LC_ALL, "UKR")
+locale.setlocale(locale.LC_ALL, "uk_UA")
 
 
 class time:
+
     __now = datetime.datetime.now()
     __next_day = __now
     __days = 0
 
     @staticmethod
+    def update_now():
+        time.__now = datetime.datetime.now()
+
+    @staticmethod
     def date_month():
         return time.__now.strftime("%d,%B").title()
+
 
     @staticmethod
     def get_data_format(obj):
