@@ -125,7 +125,7 @@ class parser:
                 else:
                     string += f"{i.text}" + "\n"
 
-            string += group
+            string += group + "\n\n"
             return [string]
 
     def today(self, soup):
