@@ -44,10 +44,11 @@ class Table(parser):
             for i in w:
                 line = body.get(i).get(j)
                 line = line[0]
+                # print(line)
                 if line != "0":
                     table += f"<i>{timeset.get(i)}</i>\n{line}"
 
-            if len(table)<50:
+            if len(table)<40:
                 table += "Пар немає 👌\n\n"
             table += "@kpi_rozklad_bot"
             await bot.send_message(text=table, chat_id=chat_id, parse_mode="HTML", disable_web_page_preview=True)

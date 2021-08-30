@@ -1,5 +1,5 @@
 
-from bs4.element import NavigableString
+from bs4.element import NavigableString, Tag
 from .times import time
 
 
@@ -16,7 +16,7 @@ class parser:
 
     @staticmethod
     def chek_valid_webpage(soup):
-        chose = [soup.find_all('table', border = "0")[i] for i in range(0, len(soup.find_all('table', border = "0")))]
+        chose = [soup.find_all('table', border="0")[i] for i in range(0, len(soup.find_all('table', border="0")))]
         if chose:
             groups = []
             links = []
@@ -61,7 +61,7 @@ class parser:
     def clear_body(self, body, params):
         column = params.get("column")
         if column > 2:
-            del body[params.get("column") - 1]
+            del body[int(params.get("lines")/2)]
             del body[0]
 
         lines = list()
@@ -74,7 +74,6 @@ class parser:
             lines.append(line)
 
         return dict(enumerate(lines))
-
 
     def get_pair(self, obj):
         table = list()
@@ -90,7 +89,7 @@ class parser:
                         elif "Лек" in j.text:
                             string += " 📚"
                         elif "Лаб" in j.text:
-                            string+= " 🔬"
+                            string += " 🔬"
                         string += f"<a href ='{link}'>{j.text}</a>" + "\n"
                     else:
                         string += f"{j.text}\n"
@@ -145,7 +144,7 @@ class parser:
             pair = parser.get_current_pair(self, current_pair)
             long = index + 1
 
-        if closest_pair:
+        if closest_pair and parser.is_end_pair(self):
             for i in parser.main_week:
                 pairs = i.find_all('td', class_="closest_pair")
                 if pairs == closest_pair and self.current_week == "first":
@@ -156,7 +155,6 @@ class parser:
                     long = len(day_backlight)
         if day_backlight:
             long = len(day_backlight)
-
 
         lines = list()
         for td in range(long):
@@ -171,8 +169,8 @@ class parser:
     def __current_week(soup):
 
         seach = "day_backlight"
-        parser.main_week= body = [soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')[i] for i in
-                range(0, len(soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')))]
+        parser.main_week = body = [soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')[i] for i in
+                                   range(0, len(soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')))]
 
         for i in body:
             if i.find_all('td', class_=seach):
@@ -186,8 +184,15 @@ class parser:
             if body[tr].find_all('td', class_="closest_pair"):
                 return tr
 
+    def is_end_pair(self):
+        count = 0
 
+        day = time.day_index()
+        week = parser.first_week_set(self) if self.current_week == "first" else parser.second_week_set(self)
+        body = self.cl_body
 
+        for i in week:
+            if body.get(i).get(day) != '0':
+                count = i
 
-
-
+        return time.pair_index() < count
