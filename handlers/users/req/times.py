@@ -11,6 +11,9 @@ class time:
     __next_day = __now
     __days = 0
 
+    def __init__(self):
+        time.update_now()
+
     @staticmethod
     def update_now():
         time.__now = datetime.datetime.now()
@@ -131,9 +134,28 @@ class time:
 
     @staticmethod
     def pair_index():
-        for m in range(1440):
+        for m in range(180):
             diapazon = {0: '08:30', 1: '10:25', 2: '12:20', 3: '14:15', 4: '16:10', 5: '18:30'}
             cur = datetime.datetime.now() + datetime.timedelta(minutes=m)
             for i in range(6):
                 if cur.strftime("%H:%M") == diapazon.get(i):
                     return int(i)
+
+    @staticmethod
+    def is_now_pair(count):
+        pair_time = {0: {"h": 8, "m": 30},
+                     1: {"h": 10, "m": 25},
+                     2: {"h": 12, "m": 20},
+                     3: {"h": 14, "m": 15},
+                     4: {"h": 16, "m": 10},
+                     5: {"h": 18, "m": 30}}
+
+        now = datetime.datetime.now()
+        pair = now.replace(hour=pair_time.get(count).get("h"),minute=pair_time.get(count).get("h"), second = 0, microsecond=0) +  datetime.timedelta(hours=1, minutes=30)
+        nigth = now.replace(hour = 23, minute = 59, second = 0, microsecond=0)
+
+
+        if now > pair and now < nigth:
+            return False
+        else:
+            return True

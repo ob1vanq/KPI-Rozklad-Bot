@@ -1,9 +1,7 @@
 import requests
-import lxml
 import fake_useragent
-
 from bs4 import BeautifulSoup
-from requests import ConnectionError, HTTPError
+from requests import HTTPError
 
 
 class connect:
@@ -37,7 +35,7 @@ class connect:
 
     headers = {'user-agent': fake_useragent.UserAgent().random}
 
-    def __init__(self, title: str, person: str):
+    def __init__(self, title: str = None, person: str = None):
         self.title = title
         if person == "student":
             self.data = connect.format_data(self, connect.data_student, p=connect.student)
@@ -47,7 +45,7 @@ class connect:
             self.url = connect.url_teacher
 
         self.error: str
-        connect.connect(self)
+        # connect.connect(self)
 
     def format_data(self, data, p):
         data.update({p: self.title})
@@ -56,17 +54,15 @@ class connect:
     def connect(self):
 
         try:
-            response = requests.post(self.url, headers=connect.headers, data=self.data)
+            response = requests.post(self.url, headers=connect.headers, data=self.data, timeout=30)
             response.raise_for_status()
-        except ConnectionError as err:
-            self.error = f"Помилка: {err}"
-            return False
-
         except HTTPError as err:
-            self.error = f"Помилка: {err}"
+            self.error = f"<i>HTTPError:\n\n {err}</i>"
             return False
         except:
-            self.error = f"Відбулась невідома помилка"
+            url = "http://rozklad.kpi.ua/Schedules/ScheduleGroupSelection.aspx"
+            self.error = f"<i><a href = '{url}'>Розклад КПІ</a> перенавантажений. Спробуйте пізніше.</i>"
+            return False
         else:
             connect.soup(self, response)
             return True

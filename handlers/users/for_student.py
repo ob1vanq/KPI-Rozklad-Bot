@@ -1,7 +1,7 @@
-import requests
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
+from aiogram.types import ReplyKeyboardRemove
 
 from handlers.users.req.connection import connect
 from handlers.users.req.table import Table
@@ -20,12 +20,12 @@ async def get_user_group(message: types.Message):
 
 @dp.message_handler(state=get_group_st.group)
 async def connect_to_site(message: types.Message, state: FSMContext):
+    await message.answer("<i>⌛ Підключення до серверу...</i>", parse_mode="HTML",reply_markup=ReplyKeyboardRemove())
     group = message.text
     connection = connect(title=group, person="student")
-    soup = connection.soup
 
     if connection.connect():
-
+        soup = connection.soup
         if Table.chek_valid_webpage(soup):
             d = Table.chek_valid_webpage(soup)
             keyb = construct(d)
@@ -38,7 +38,7 @@ async def connect_to_site(message: types.Message, state: FSMContext):
             await get_group_st.option.set()
 
         elif isinstance(Table.is_valid_student(soup), str):
-            await message.answer(text=Table.is_valid_student(soup))
+            await message.answer(text=Table.is_valid_student(soup), reply_markup=keyboard_back)
         else:
             await message.answer(text=f"Оберіть наступну дію", reply_markup=keyboard2)
             await state.update_data(
@@ -74,14 +74,16 @@ async def post_full_table(message: types.Message, state: FSMContext):
     group = data.get("group")
     connection = connect(title=group, person="student")
 
-    if await state.get_state() == "get_group_st:option2":
-        url = data.get("url")
-        soup = connect.get_soup(url)
-    else:
-        soup = connection.soup
-
     if connection.connect():
+
+        if await state.get_state() == "get_group_st:option2":
+            url = data.get("url")
+            soup = connect.get_soup(url)
+        else:
+            soup = connection.soup
+
         student = Table(soup)
+
         if message.text == "Цей тиждень":
             await message.answer("Розклад на цей тиждень", reply_markup=keyboard2)
             week = "first" if student.current_week == "first" else "second"
@@ -102,13 +104,12 @@ async def post_one_table(message: types.Message, state: FSMContext):
     group = data.get("group")
     connection = connect(title=group, person="student")
 
-    if state == get_group_st.option2:
-        url = data.get("url")
-        soup = connect.get_soup(url)
-    else:
-        soup = connection.soup
-
     if connection.connect():
+        if state == get_group_st.option2:
+            url = data.get("url")
+            soup = connect.get_soup(url)
+        else:
+            soup = connection.soup
         student = Table(soup)
         await message.answer(f"Розклад на {time.current_day()}", reply_markup=keyboard2)
 
@@ -117,3 +118,4 @@ async def post_one_table(message: types.Message, state: FSMContext):
     else:
         await message.answer(text=f"{connection.error}", reply_markup=keyboard)
         await state.finish()
+

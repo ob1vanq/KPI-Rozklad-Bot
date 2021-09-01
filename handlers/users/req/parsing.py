@@ -1,4 +1,3 @@
-
 from bs4.element import NavigableString, Tag
 from .times import time
 
@@ -16,7 +15,11 @@ class parser:
 
     @staticmethod
     def chek_valid_webpage(soup):
-        chose = [soup.find_all('table', border="0")[i] for i in range(0, len(soup.find_all('table', border="0")))]
+        try:
+            chose = [soup.find_all('table', border="0")[i] for i in range(0, len(soup.find_all('table', border="0")))]
+        except:
+            return False
+
         if chose:
             groups = []
             links = []
@@ -61,7 +64,7 @@ class parser:
     def clear_body(self, body, params):
         column = params.get("column")
         if column > 2:
-            del body[int(params.get("lines")/2)]
+            del body[int(params.get("lines") / 2)]
             del body[0]
 
         lines = list()
@@ -144,7 +147,7 @@ class parser:
             pair = parser.get_current_pair(self, current_pair)
             long = index + 1
 
-        if closest_pair and parser.is_end_pair(self):
+        if closest_pair and time.is_now_pair(parser.how_pair_today(self)):
             for i in parser.main_week:
                 pairs = i.find_all('td', class_="closest_pair")
                 if pairs == closest_pair and self.current_week == "first":
@@ -184,7 +187,7 @@ class parser:
             if body[tr].find_all('td', class_="closest_pair"):
                 return tr
 
-    def is_end_pair(self):
+    def how_pair_today(self):
         count = 0
 
         day = time.day_index()
@@ -194,5 +197,4 @@ class parser:
         for i in week:
             if body.get(i).get(day) != '0':
                 count = i
-
-        return time.pair_index() < count
+        return count
