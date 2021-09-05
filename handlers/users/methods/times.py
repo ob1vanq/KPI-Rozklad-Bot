@@ -6,22 +6,17 @@ locale.setlocale(locale.LC_ALL, "uk_UA.utf8")
 
 
 class time:
-
     __now = datetime.datetime.now()
     __next_day = __now
     __days = 0
 
-    def __init__(self):
-        time.update_now()
-
     @staticmethod
-    def update_now():
-        time.__now = datetime.datetime.now()
+    def now(text):
+        return datetime.datetime.now().strftime(f"{text}")
 
     @staticmethod
     def date_month():
-        return time.__now.strftime("%d,%B").title()
-
+        return time.now("%d,%B").title()
 
     @staticmethod
     def get_data_format(obj):
@@ -38,26 +33,21 @@ class time:
             time.__next_day = time.__next_day + datetime.timedelta(days=time.__days)
             return time.get_data_format(time.__next_day)
 
-
-
     @staticmethod
     def reset():
-        time.__next_day = time.__now
+        time.__now = time.__next_day = datetime.datetime.now()
         time.__days = 0
 
     @staticmethod
     def current_day():
-        time.update_now()
-        return time.__now.strftime("%A").title()
+        return datetime.datetime.now().strftime("%A").title()
 
     @staticmethod
     def hour_minutes(text="%H:%M"):
-        time.update_now()
-        return time.__now.strftime(text).title()
+        return time.now(text).title()
 
     @staticmethod
     def day_before():
-        time.update_now()
         current = time.hour_minutes("%A").lower()
         if current == 'понеділок':
             return 7
@@ -76,7 +66,6 @@ class time:
 
     @staticmethod
     def day_after():
-        time.update_now()
         current = time.hour_minutes("%A").lower()
         if current == 'понеділок':
             return 0
@@ -102,23 +91,22 @@ class time:
             time.__next_day = time.__next_day + datetime.timedelta(time.day_before())
 
     @staticmethod
-    def timeset(week, params = None):
+    def timeset(week, params=None):
         if week == "first":
             return {0: '08:30', 1: '10:25', 2: '12:20', 3: '14:15', 4: '16:10', 5: '18:30'}
         elif week == "second":
             timeset = dict()
             timelst = ['08:30', '10:25', '12:20', '14:15', '16:10', '18:30']
             lines = int((params.get("lines") - 2) / 2)
-            indexes = [i for i in range(lines, lines*2)]
+            indexes = [i for i in range(lines, lines * 2)]
             for i in range(len(indexes)):
-                timeset.update({indexes[i]:timelst[i]})
+                timeset.update({indexes[i]: timelst[i]})
             return timeset
 
     @staticmethod
     def get_days_lst(params):
         column = params.get('column') - 1
         return [i for i in range(column)]
-
 
     @staticmethod
     def day_index():
@@ -151,9 +139,9 @@ class time:
                      5: {"h": 18, "m": 30}}
 
         now = datetime.datetime.now()
-        pair = now.replace(hour=pair_time.get(count).get("h"),minute=pair_time.get(count).get("h"), second = 0, microsecond=0) +  datetime.timedelta(hours=1, minutes=30)
-        nigth = now.replace(hour = 23, minute = 59, second = 0, microsecond=0)
-
+        pair = now.replace(hour=pair_time.get(count).get("h"), minute=pair_time.get(count).get("m"), second=0,
+                           microsecond=0) + datetime.timedelta(hours=1, minutes=30)
+        nigth = now.replace(hour=23, minute=59, second=0, microsecond=0)
 
         if now > pair and now < nigth:
             return False

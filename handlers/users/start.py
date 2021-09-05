@@ -7,12 +7,12 @@ from aiogram.dispatcher.filters.builtin import CommandStart, Text, Command
 from data.config import ADMINS
 from keyboards.default.rozklad import keyboard
 from loader import dp, bot
-from states.get_group_state import get_group_st, get_group_th
+from states.get_group_state import student_state, teacher_state
 
-states = [get_group_st.group, get_group_st.chose,
-          get_group_th.group, get_group_st.option2,
-          get_group_st.option, None,
-          get_group_th.group, get_group_th.chose]
+states = [student_state.group, student_state.chose,
+          teacher_state.group, student_state.option2,
+          student_state.option, None,
+          teacher_state.group, teacher_state.chose]
 
 
 @dp.message_handler(CommandStart(), state=states)

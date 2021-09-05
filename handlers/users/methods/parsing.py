@@ -11,7 +11,6 @@ class parser:
         self.params = parser.get_table_params(self, self.body)
         self.cl_body = parser.clear_body(self, params=self.params, body=self.body)
         self.current_week = parser.__current_week(soup)
-        time.update_now()
 
     @staticmethod
     def chek_valid_webpage(soup):
@@ -170,16 +169,17 @@ class parser:
 
     @staticmethod
     def __current_week(soup):
-
-        seach = "day_backlight"
         parser.main_week = body = [soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')[i] for i in
                                    range(0, len(soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')))]
 
-        for i in body:
-            if i.find_all('td', class_=seach):
-                return "first"
-            else:
+        if body[0].find_all('td', class_ = 'day_backlight') and body[0].find_all('td', class_ = 'closest_pair'):
+            return "first"
+        else:
+            if body[0].find_all('td', class_ = 'closest_pair'):
                 return "second"
+            else:
+                return "first"
+
 
     def get_closest_index(self):
         body = self.body
@@ -189,7 +189,6 @@ class parser:
 
     def how_pair_today(self):
         count = 0
-
         day = time.day_index()
         week = parser.first_week_set(self) if self.current_week == "first" else parser.second_week_set(self)
         body = self.cl_body
@@ -198,3 +197,6 @@ class parser:
             if body.get(i).get(day) != '0':
                 count = i
         return count
+
+
+

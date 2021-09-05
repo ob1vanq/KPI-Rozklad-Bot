@@ -4,22 +4,22 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 
-from handlers.users.req.connection import connect
-from handlers.users.req.table import Table
-from handlers.users.req.times import time
+from handlers.users.methods.connection import connect
+from handlers.users.methods.table import Table
+from handlers.users.methods.times import time
 from keyboards.default.rozklad import keyboard2, keyboard, keyboard_back
 from loader import dp
-from states.get_group_state import get_group_th
+from states.get_group_state import teacher_state
 
 
 @dp.message_handler(Text(equals=["Я викладач 👩‍🏫"]), state=None)
 async def get_user_group(message: types.Message):
     await message.answer("Вкажіть ПІБ\n\n<i>Наприклад:</i> <pre>Казміренко Віктор Анатолійович</pre>", parse_mode="HTML",
                         reply_markup= keyboard_back)
-    await get_group_th.group.set()
+    await teacher_state.group.set()
 
 
-@dp.message_handler(state=get_group_th.group)
+@dp.message_handler(state=teacher_state.group)
 async def connect_to_site(message: types.Message, state: FSMContext):
     await message.answer("<i>⌛ Підключення до серверу...</i>", parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
     name = message.text
@@ -30,7 +30,7 @@ async def connect_to_site(message: types.Message, state: FSMContext):
 
         if isinstance(Table.is_valid_teacher(soup), str):
             await message.answer(text=Table.is_valid_teacher(soup))
-            await get_group_th.group.set()
+            await teacher_state.group.set()
         else:
             await message.answer(text=f"Оберіть наступну дію", reply_markup=keyboard2)
             await state.update_data(
@@ -38,13 +38,13 @@ async def connect_to_site(message: types.Message, state: FSMContext):
                     "name": name
                 }
             )
-            await get_group_th.next()
+            await teacher_state.next()
     else:
         await message.answer(text=f"{connection.error}", reply_markup=keyboard)
         await state.finish()
 
 
-@dp.message_handler(Text(equals=["Цей тиждень" ,"Наступний тиждень"]), state=get_group_th.chose)
+@dp.message_handler(Text(equals=["Цей тиждень" ,"Наступний тиждень"]), state=teacher_state.chose)
 async def post_full_table(message: types.Message, state: FSMContext):
     data = await state.get_data()
     name = data.get("name")
@@ -65,7 +65,7 @@ async def post_full_table(message: types.Message, state: FSMContext):
         await message.answer(text=f"{connection.error}", reply_markup=keyboard)
         await state.finish()
 
-@dp.message_handler(Text(equals=[f"Показати розклад на сьогодні: {time.current_day()}"]), state=get_group_th.chose)
+@dp.message_handler(Text(equals=[f"Показати розклад на сьогодні"]), state=teacher_state.chose)
 async def post_one_table(message: types.Message, state: FSMContext):
     data = await state.get_data()
     name = data.get("name")

@@ -1,6 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-from handlers.users.req.times import time
+from handlers.users.methods.times import time
 
 keyboard = ReplyKeyboardMarkup(
     resize_keyboard= True,
@@ -20,7 +20,7 @@ keyboard2 = ReplyKeyboardMarkup(
     resize_keyboard= True,
     keyboard=[
         [
-            KeyboardButton(text=f"Показати розклад на сьогодні: {time.current_day()}")
+            KeyboardButton(text=f"Показати розклад на сьогодні")
         ],
         [
             KeyboardButton(text="Цей тиждень"),

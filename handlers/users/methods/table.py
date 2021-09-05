@@ -9,8 +9,7 @@ class Table(parser):
     def __init__(self, soup):
         self.soup = soup
         super().__init__(soup)
-
-
+        time.reset()
 
     @staticmethod
     def is_valid_student(soup):
@@ -29,6 +28,8 @@ class Table(parser):
         time.reset()
         timeset = time.timeset(week, params=self.params)
 
+        cur_week = "Перший тиждень" if week == 'first' else "Другий тиждень"
+
         body = self.cl_body
         w = list()
 
@@ -40,11 +41,10 @@ class Table(parser):
             w = Table.second_week_set(self)
 
         for j in time.get_days_lst(self.params):
-            table = f"🗓<b>{time.next_day()}\n\n</b>"
+            table = f"🗓<b>{time.next_day()}</b>\n<i>{cur_week}</i>\n\n"
             for i in w:
                 line = body.get(i).get(j)
                 line = line[0]
-                # print(line)
                 if line != "0":
                     table += f"<i>{timeset.get(i)}</i>\n{line}"
 
@@ -69,6 +69,8 @@ class Table(parser):
             table += "Пар немає 👌\n"
         table += "\n@kpi_rozklad_bot"
         return table
+
+
 
 
 
