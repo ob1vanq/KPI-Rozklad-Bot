@@ -87,11 +87,11 @@ async def post_full_table(message: types.Message, state: FSMContext):
         if message.text == "Цей тиждень":
             await message.answer("Розклад на цей тиждень", reply_markup=keyboard2)
             week = "first" if student.current_week == "first" else "second"
-            await student.get_week(chat_id=message.from_user.id, week=week)
+            await student.get_week(chat_id=message.from_user.id, week=week, group = group)
         elif message.text == "Наступний тиждень":
             week = "second" if student.current_week == "first" else "first"
             await message.answer("Розклад на наступний тиждень", reply_markup=keyboard2)
-            await student.get_week(chat_id=message.from_user.id, week=week)
+            await student.get_week(chat_id=message.from_user.id, week=week, group = group)
     else:
         await message.answer(text=f"{connection.error}", reply_markup=keyboard)
         await state.finish()
@@ -113,7 +113,7 @@ async def post_one_table(message: types.Message, state: FSMContext):
         student = Table(soup)
         await message.answer(f"Розклад на {time.current_day()}", reply_markup=keyboard2)
 
-        str = f"<pre>{group}</pre>\n" + student.get_today()
+        str = f"<b>{group}</b>\n" + student.get_today()
         await message.answer(str, parse_mode="HTML", disable_web_page_preview=True)
     else:
         await message.answer(text=f"{connection.error}", reply_markup=keyboard)

@@ -5,11 +5,13 @@ from .times import time
 class Table(parser):
 
     url = "http://rozklad.kpi.ua/Schedules/ScheduleGroupSelection.aspx"
+    not_pair_char = 100
 
     def __init__(self, soup):
         self.soup = soup
         super().__init__(soup)
         time.reset()
+
 
     @staticmethod
     def is_valid_student(soup):
@@ -23,7 +25,7 @@ class Table(parser):
         if not_name:
             return not_name.text
 
-    async def get_week(self, week, chat_id):
+    async def get_week(self, week, chat_id, group = ""):
 
         time.reset()
         timeset = time.timeset(week, params=self.params)
@@ -41,14 +43,13 @@ class Table(parser):
             w = Table.second_week_set(self)
 
         for j in time.get_days_lst(self.params):
-            table = f"🗓<b>{time.next_day()}</b>\n<i>{cur_week}</i>\n\n"
+            table = f"🗓<b>{time.next_day()}</b>\n<i>{cur_week}   {group}</i>\n\n"
             for i in w:
                 line = body.get(i).get(j)
                 line = line[0]
                 if line != "0":
                     table += f"<i>{timeset.get(i)}</i>\n{line}"
-
-            if len(table)<40:
+            if len(table) < Table.not_pair_char:
                 table += "Пар немає 👌\n\n"
             table += "@kpi_rozklad_bot"
             await bot.send_message(text=table, chat_id=chat_id, parse_mode="HTML", disable_web_page_preview=True)
@@ -65,7 +66,7 @@ class Table(parser):
 
             if line != "0":
                 table += f"<i>{i+1} - {timeset.get(i)}</i>\n{line}"
-        if len(table) < 50:
+        if len(table) < Table.not_pair_char:
             table += "Пар немає 👌\n"
         table += "\n@kpi_rozklad_bot"
         return table
