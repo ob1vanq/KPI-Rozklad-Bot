@@ -10,7 +10,7 @@ class parser:
         self.body = [soup.find_all('tr')[i] for i in range(0, len(soup.find_all('tr')))]
         self.params = parser.get_table_params(self, self.body)
         self.cl_body = parser.clear_body(self, params=self.params, body=self.body)
-        self.current_week = parser.__current_week(soup)
+        self.current_week = parser.current_week(self, soup)
 
     @staticmethod
     def chek_valid_webpage(soup):
@@ -59,6 +59,10 @@ class parser:
     @staticmethod
     def get_td(obj):
         return [[obj.find_all('td')[i]] for i in range(0, len(obj.find_all('td')))]
+
+    @staticmethod
+    def get_tr(obj):
+        return [[obj.find_all('tr')[i]] for i in range(0, len(obj.find_all('tr')))]
 
     def clear_body(self, body, params):
         column = params.get("column")
@@ -141,6 +145,7 @@ class parser:
         long = int()
         pair = str()
 
+
         if current_pair:
             index = time.pair_index() - 1
             pair = parser.get_current_pair(self, current_pair)
@@ -149,7 +154,7 @@ class parser:
         if closest_pair and time.is_now_pair(parser.how_pair_today(self)):
             for i in parser.main_week:
                 pairs = i.find_all('td', class_="closest_pair")
-                if pairs == closest_pair and self.current_week == "first":
+                if pairs == closest_pair:
                     index = parser.get_closest_index(self)
                     pair = ["<b>⏩ Наступна пара\n\n</b>" + parser.get_pair(self, closest_pair)[0]]
                     long = index + 1
@@ -167,25 +172,36 @@ class parser:
 
         return dict(enumerate(lines))
 
-    @staticmethod
-    def __current_week(soup):
-        parser.main_week = body = [soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')[i] for i in
-                                   range(0, len(soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')))]
+    def current_week(self, soup):
 
-        if body[0].find_all('td', class_ = 'day_backlight') and body[0].find_all('td', class_ = 'closest_pair'):
+        first = [soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')[i] for i in
+                range(0, len(soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')))]
+
+        second = [soup.find_all('table', id='ctl00_MainContent_SecondScheduleTable')[i] for i in
+                range(0, len(soup.find_all('table', id='ctl00_MainContent_SecondScheduleTable')))]
+
+        if first[0].find_all("td", class_ = "day_backlight"):
+            parser.main_week = first
             return "first"
-        else:
-            if body[0].find_all('td', class_ = 'closest_pair'):
-                return "second"
-            else:
-                return "first"
+        elif second[0].find_all("td", class_ = "day_backlight"):
+            parser.main_week = second
+            return "second"
+        elif not second[0].find_all("td", class_ = "day_backlight") and second[0].find_all("td", class_ = "closest_pair"):
+            parser.main_week = first
+            return "first"
+        elif not second[0].find_all("td", class_ = "day_backlight") and second[0].find_all("td", class_ = "closest_pair"):
+            parser.main_week = second
+            return "second"
+
 
 
     def get_closest_index(self):
-        body = self.body
-        for tr in range(len(body)):
-            if body[tr].find_all('td', class_="closest_pair"):
-                return tr
+        body = self.main_week[0]
+        body = parser.get_tr(body)
+        del body[0]
+        for i in range(len(body)):
+            if body[i][0].find_all('td', class_ = 'closest_pair'):
+                return i
 
     def how_pair_today(self):
         count = 0
@@ -195,8 +211,5 @@ class parser:
 
         for i in week:
             if body.get(i).get(day) != '0':
-                count = i
-        return count
-
-
-
+                count += 1
+        return count - 1

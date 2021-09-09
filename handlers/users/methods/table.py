@@ -13,6 +13,7 @@ class Table(parser):
         time.reset()
 
 
+
     @staticmethod
     def is_valid_student(soup):
         not_group = soup.find('span', id="ctl00_MainContent_ctl00_lblError")

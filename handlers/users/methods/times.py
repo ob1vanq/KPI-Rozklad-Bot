@@ -1,7 +1,6 @@
 import datetime
 import locale
 
-
 locale.setlocale(locale.LC_ALL, "uk_UA.utf8")
 
 
@@ -140,10 +139,11 @@ class time:
 
         now = datetime.datetime.now()
         pair = now.replace(hour=pair_time.get(count).get("h"), minute=pair_time.get(count).get("m"), second=0,
-                           microsecond=0) + datetime.timedelta(hours=1, minutes=30)
+                               microsecond=0) + datetime.timedelta(hours=1, minutes=30)
         nigth = now.replace(hour=23, minute=59, second=0, microsecond=0)
 
         if now > pair and now < nigth:
             return False
+
         else:
             return True
