@@ -84,6 +84,7 @@ class time:
     @staticmethod
     def set_week(week, current_week):
         time.__days = 0
+        print(time.__days)
         if week == current_week:
             time.__next_day = time.__next_day - datetime.timedelta(time.day_after())
         else:
@@ -137,13 +138,16 @@ class time:
                      4: {"h": 16, "m": 10},
                      5: {"h": 18, "m": 30}}
 
-        now = datetime.datetime.now()
-        pair = now.replace(hour=pair_time.get(count).get("h"), minute=pair_time.get(count).get("m"), second=0,
-                               microsecond=0) + datetime.timedelta(hours=1, minutes=30)
-        nigth = now.replace(hour=23, minute=59, second=0, microsecond=0)
+        now = datetime.datetime.now().replace(second=0, microsecond=0)
+        try:
+            pair = now.replace(hour=pair_time.get(count).get("h"), minute=pair_time.get(count).get("m"), second=0,
+                               microsecond=0) + datetime.timedelta(hours=1, minutes=35)
+        except:
+            return True
 
-        if now > pair and now < nigth:
+        night = now.replace(hour=23, minute=59, second=59, microsecond=0)
+
+        if (now > pair and now < night):
             return False
 
-        else:
-            return True
+        return True

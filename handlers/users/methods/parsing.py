@@ -5,12 +5,13 @@ from .times import time
 class parser:
     rooms_tuple = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
     main_week = []
+    main_week_name = "None"
 
     def __init__(self, soup):
         self.body = [soup.find_all('tr')[i] for i in range(0, len(soup.find_all('tr')))]
         self.params = parser.get_table_params(self, self.body)
         self.cl_body = parser.clear_body(self, params=self.params, body=self.body)
-        self.current_week = parser.current_week(self, soup)
+        self.current_week = parser.main_week_name = parser.current_week(self, soup)
 
     @staticmethod
     def chek_valid_webpage(soup):
@@ -150,6 +151,7 @@ class parser:
             index = time.pair_index() - 1
             pair = parser.get_current_pair(self, current_pair)
             long = index + 1
+        time.is_now_pair(parser.how_pair_today(self))
 
         if closest_pair and time.is_now_pair(parser.how_pair_today(self)):
             for i in parser.main_week:
@@ -177,22 +179,25 @@ class parser:
         first = [soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')[i] for i in
                 range(0, len(soup.find_all('table', id='ctl00_MainContent_FirstScheduleTable')))]
 
+
         second = [soup.find_all('table', id='ctl00_MainContent_SecondScheduleTable')[i] for i in
                 range(0, len(soup.find_all('table', id='ctl00_MainContent_SecondScheduleTable')))]
 
-        if first[0].find_all("td", class_ = "day_backlight"):
-            parser.main_week = first
-            return "first"
-        elif second[0].find_all("td", class_ = "day_backlight"):
-            parser.main_week = second
-            return "second"
-        elif not second[0].find_all("td", class_ = "day_backlight") and second[0].find_all("td", class_ = "closest_pair"):
-            parser.main_week = first
-            return "first"
-        elif not second[0].find_all("td", class_ = "day_backlight") and second[0].find_all("td", class_ = "closest_pair"):
-            parser.main_week = second
-            return "second"
-
+        try:
+            if first[0].find_all("td", class_ = "day_backlight"):
+                parser.main_week = first
+                return "first"
+            elif second[0].find_all("td", class_ = "day_backlight"):
+                parser.main_week = second
+                return "second"
+            elif not second[0].find_all("td", class_ = "day_backlight") and second[0].find_all("td", class_ = "closest_pair"):
+                parser.main_week = first
+                return "first"
+            elif not second[0].find_all("td", class_ = "day_backlight") and second[0].find_all("td", class_ = "closest_pair"):
+                parser.main_week = second
+                return "second"
+        except:
+            return parser.main_week_name
 
 
     def get_closest_index(self):

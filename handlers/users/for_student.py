@@ -105,7 +105,7 @@ async def post_one_table(message: types.Message, state: FSMContext):
     connection = connect(title=group, person="student")
 
     if connection.connect():
-        if state == student_state.option2:
+        if await state.get_state() == "student_state:option2":
             url = data.get("url")
             soup = connect.get_soup(url)
         else:
